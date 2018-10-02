@@ -2,7 +2,7 @@
     "appname" : "kit",
     "slides" : [ "2.jpg", "1.jpg", "3.jpg" ],
     "categories" : [
-        { "name" : "Cosmetic" , "icon": "md-face"},
+        { "name" : "Beauty" , "icon": "md-face"},
         { "name" : "Sports" , "icon": "md-bike"},
         { "name" : "Computer" , "icon": "md-devices"},
         { "name" : "Camera" , "icon": "md-camera"},
