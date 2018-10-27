@@ -293,10 +293,10 @@
   function getallProduct(cat,proD) {
     if(cat==undefined&&proD==undefined){
       var apr = db.collection("Products")
-    }else if(cat!=undefined){
+    }else if(cat!=undefined&&proD==undefined){
     var apr = db.collection("Products").where("category", "==", cat); //เลือกเฉพาะ
   }else if(proD!=undefined){
-    var apr = db.collection("Products").where("category", "like", proD);
+    var apr = db.collection("Products").where("category", "==", proD) //เหลือหา LIKE
   }
     apr.get().then(function (querySnapshot) {
       var allP_template = $('#allP_template').html();
