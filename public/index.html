@@ -105,19 +105,14 @@
       <script id="icon_template" type="text/template">
         <ons-row style="height:120px" vertical-align="center">  
         <% categories.forEach(function(category){%>  
-        <ons-col style="background:#66ff99; border:solid 1px white";   width="33%" >
-          
-      
-      
-         
+        <ons-col  onclick="getallProduct(<%= category.name %>);" style="background:#66ff99; border:solid 1px white";   width="33%" >
           <p style="text-align: center; margin: 10px;">
             <ons-icon size="60px" icon="<%= category.icon %>"></ons-icon>          
           </p>
           <p style="text-align: center; margin: 10px;" id="icon1_text">
             <%= category.name %>
           </p>
-        
-        </ons-col>
+        </ons-col> 
         <%});%>
         </ons-row>
         </script>
@@ -187,22 +182,34 @@
         <ons-search-input placeholder="Search" onchange="ons.notification.alert('Searched for: ' + this.value)"></ons-search-input>
       </p>
       <hr>
-
+      <p><b>แบรนด์สุดฮิต</b> อัพเดทใหม่วันนี้</p>
+      
       <ons-row>
-        <ons-col style="border:solid 1px black">
-          <div id="photo">
+          <div id="allP"></div>
+        
+        
+       <script id="allP_template" type="text/template"> 
+      <% allP.forEach(function(allP){
+        var item = allP.data();
+        %>  
+        <ons-col width="100%">
+          <ons-card>
+            <img src="" alt="Onsen UI" style="width: 100%">
+            <div class="title">
+              <%=item.title%>
+            </div>
+            <div class="content" id="Pdetail">
+              Price: <%= item.price %>
+            </div>
+          </ons-card>
+        </ons-col>
+        <%});%>
+      </script>
 
-          </div>
-        </ons-col>
-        <ons-col style="border:solid 1px black">
-          asdasd
-        </ons-col>
       </ons-row>
       <ons-button onclick="addnewdata()">
         ADD DATA
       </ons-button>
-
-
 
     </ons-page>
   </template>
@@ -214,6 +221,7 @@
       console.log('Home clicked');
       // get data for home screen  
       getHomeData();
+      
     } else if (event.index == 2) {
       console.log('Cart clicked');
       // get data for cart screen  
@@ -221,6 +229,7 @@
     } else if (event.index == 1) {
       console.log("Shopping clicked");
       getallProduct();
+     
     }
 
   });
@@ -247,6 +256,7 @@
     });
 
   }
+
   // function getHomeData() {
   //   $.getJSON('home.json', function (data) {
   //     console.log(data);
@@ -263,13 +273,26 @@
       console.log(data);
     });
   }
-  function getallProduct() {
-    var apr = db.collection("Products").where("category", "==", "sport"); //เลือกเฉพาะ
+  function getallProduct(cat) {
+    localStorage.setItem("cat",cat)
+    console.log(cat)
+    if(cat == undefined){
+    var apr = db.collection("Products")//.where("category", "==", "sport"); //เลือกเฉพาะ
     apr.get().then(function (querySnapshot) {
-      querySnapshot.forEach(function (doc) {
-        console.log(doc.id, " => ", doc.data());
-      })
+      var allP_template = $('#allP_template').html();
+      console.log(querySnapshot);
+      var html = ejs.render(allP_template, { allP: querySnapshot.docs });
+      $('#allP').html(html); 
     })
+  }else{
+  var apr = db.collection("Products").where("category", "==",cat); //เลือกเฉพาะ
+    apr.get().then(function (querySnapshot) {
+      var allP_template = $('#allP_template').html();
+      console.log(querySnapshot);
+      var html = ejs.render(allP_template, { allP: querySnapshot.docs });
+      $('#allP').html(html); 
+    })
+  }
   }
   function addnewdata() {
     var data = {
@@ -277,7 +300,6 @@
       title: 'IPhone20',
       price: 10000,
       category: 'electronic',
-
     }
     db.collection("Products").add(data)//ถ้าด็อกเก่าจะอัพเดท ถ้า add จะสร้างใหม่
       .then(function (docRef) {
@@ -287,6 +309,7 @@
         console.error("Error adding document: ", error);
       });
   }
+
 
 </script>
 
