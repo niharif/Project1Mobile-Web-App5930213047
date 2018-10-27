@@ -88,9 +88,11 @@
 
   <template id="tab1.html">
     <ons-page id="Tab1">
+      
       <p style="text-align: center; margin-top: 10px;">
-        <ons-search-input placeholder="Search" onchange="ons.notification.alert('Searched for: ' + this.value)"></ons-search-input>
+        <ons-search-input placeholder="Search" onchange="searchPro(this.value)"></ons-search-input>
       </p>
+
       <ons-carousel swipeable auto-scroll overscrollable id="carousel" style="height: 300px;">
         <ons-carousel-item id="carousel1" style="background: url('images/1.jpg') no-repeat center; background-size: contain;">
         </ons-carousel-item>
@@ -184,15 +186,16 @@
       <hr>
       <p><b>แบรนด์สุดฮิต</b> อัพเดทใหม่วันนี้</p>
       
-      <ons-row>
+      
           <div id="allP"></div>
         
         
        <script id="allP_template" type="text/template"> 
+        <ons-row>
       <% allP.forEach(function(allP){
         var item = allP.data();
         %>  
-        <ons-col width="100%">
+        <ons-col width="33%">
           <ons-card>
             <img src="" alt="Onsen UI" style="width: 100%">
             <div class="title">
@@ -204,9 +207,10 @@
           </ons-card>
         </ons-col>
         <%});%>
-      </script>
-
       </ons-row>
+    </script>
+
+      
       <ons-button onclick="addnewdata()">
         ADD DATA
       </ons-button>
@@ -221,7 +225,9 @@
       console.log('Home clicked');
       // get data for home screen  
       localStorage.clear('cat');
+      localStorage.clear('proD');
       console.log(cat);
+      console.log(proD);
       getHomeData();
       
     } else if (event.index == 2) {
@@ -232,14 +238,15 @@
       console.log("Shopping clicked");
 
       var cat = localStorage.getItem('cat');
+      var proD = localStorage.getItem('proD');
       console.log(cat);
-      if(cat==undefined){
+      if(cat==undefined&&proD==undefined){
         getallProduct();
-      }else{
-        getallProduct(cat);
- 
+      }else if(cat!=undefined||proD!=undefined){
+        getallProduct(cat,proD);
     }
-    }
+    
+  }
 
   });
 
@@ -282,11 +289,14 @@
       console.log(data);
     });
   }
-  function getallProduct(cat) {
-    if(cat==undefined){
+
+  function getallProduct(cat,proD) {
+    if(cat==undefined&&proD==undefined){
       var apr = db.collection("Products")
-    }else{
+    }else if(cat!=undefined){
     var apr = db.collection("Products").where("category", "==", cat); //เลือกเฉพาะ
+  }else if(proD!=undefined){
+    var apr = db.collection("Products").where("category", "like", proD);
   }
     apr.get().then(function (querySnapshot) {
       var allP_template = $('#allP_template').html();
@@ -315,6 +325,11 @@ function SelectCat(cat){
   localStorage.setItem("cat",cat)
     document.getElementById('tabbar').setActiveTab(1);
   
+}
+
+function searchPro(proD){
+localStorage.setItem("proD",proD)
+document.getElementById('tabbar').setActiveTab(1);
 }
 
 </script>
