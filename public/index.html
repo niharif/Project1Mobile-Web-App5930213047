@@ -76,7 +76,7 @@
       </div>
     </ons-toolbar>
 
-    <ons-tabbar swipeable position="auto">
+    <ons-tabbar id="tabbar" swipeable position="auto">
       <ons-tab page="tab1.html" label="Home" icon="ion-home, material:md-home" badge="7" active>
       </ons-tab>
       <ons-tab page="tab3.html" label="Shopping" icon="fa-shopping-cart" active-icon="fa-shopping-cart">
@@ -100,12 +100,12 @@
         </ons-carousel-item>
       </ons-carousel>
 
-      <div id="icons"></div>
+      <div id="icons" ></div>
 
       <script id="icon_template" type="text/template">
         <ons-row style="height:120px" vertical-align="center">  
         <% categories.forEach(function(category){%>  
-        <ons-col  onclick="getallProduct(<%= category.name %>);" style="background:#66ff99; border:solid 1px white";   width="33%" >
+        <ons-col onclick="SelectCat('<%= category.name %>')" style="background:#66ff99; border:solid 1px white";   width="33%" >
           <p style="text-align: center; margin: 10px;">
             <ons-icon size="60px" icon="<%= category.icon %>"></ons-icon>          
           </p>
@@ -220,6 +220,8 @@
     if (event.index == 0) {
       console.log('Home clicked');
       // get data for home screen  
+      localStorage.clear('cat');
+      console.log(cat);
       getHomeData();
       
     } else if (event.index == 2) {
@@ -228,8 +230,15 @@
       getCartData();
     } else if (event.index == 1) {
       console.log("Shopping clicked");
-      getallProduct();
-     
+
+      var cat = localStorage.getItem('cat');
+      console.log(cat);
+      if(cat==undefined){
+        getallProduct();
+      }else{
+        getallProduct(cat);
+ 
+    }
     }
 
   });
@@ -274,25 +283,18 @@
     });
   }
   function getallProduct(cat) {
-    localStorage.setItem("cat",cat)
-    console.log(cat)
-    if(cat == undefined){
-    var apr = db.collection("Products")//.where("category", "==", "sport"); //เลือกเฉพาะ
-    apr.get().then(function (querySnapshot) {
-      var allP_template = $('#allP_template').html();
-      console.log(querySnapshot);
-      var html = ejs.render(allP_template, { allP: querySnapshot.docs });
-      $('#allP').html(html); 
-    })
-  }else{
-  var apr = db.collection("Products").where("category", "==",cat); //เลือกเฉพาะ
-    apr.get().then(function (querySnapshot) {
-      var allP_template = $('#allP_template').html();
-      console.log(querySnapshot);
-      var html = ejs.render(allP_template, { allP: querySnapshot.docs });
-      $('#allP').html(html); 
-    })
+    if(cat==undefined){
+      var apr = db.collection("Products")
+    }else{
+    var apr = db.collection("Products").where("category", "==", cat); //เลือกเฉพาะ
   }
+    apr.get().then(function (querySnapshot) {
+      var allP_template = $('#allP_template').html();
+      console.log(querySnapshot);
+      var html = ejs.render(allP_template, { allP: querySnapshot.docs });
+      $('#allP').html(html); 
+    })
+  
   }
   function addnewdata() {
     var data = {
@@ -309,7 +311,11 @@
         console.error("Error adding document: ", error);
       });
   }
-
+function SelectCat(cat){
+  localStorage.setItem("cat",cat)
+    document.getElementById('tabbar').setActiveTab(1);
+  
+}
 
 </script>
 
