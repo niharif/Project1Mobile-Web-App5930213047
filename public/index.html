@@ -63,6 +63,7 @@
 
 
 <body>
+    <ons-navigator swipeable id="myNavigator">
   <ons-page>
     <ons-toolbar>
       <div class="left">
@@ -85,7 +86,8 @@
       </ons-tab>
     </ons-tabbar>
   </ons-page>
-
+</ons-navigator>
+<!--HOME-->
   <template id="tab1.html">
     <ons-page id="Tab1">
       
@@ -179,25 +181,23 @@
   <!-- Tab SHOPPING-->
 
   <template id="tab3.html">
-    <ons-page id="Tab3">
+    <ons-page >
       <p style="text-align: center; margin-top: 10px;">
         <ons-search-input placeholder="Search" onchange="ons.notification.alert('Searched for: ' + this.value)"></ons-search-input>
       </p>
       <hr>
       <p><b>แบรนด์สุดฮิต</b> อัพเดทใหม่วันนี้</p>
-      
-      
+         
           <div id="allP"></div>
-        
-        
+          
        <script id="allP_template" type="text/template"> 
         <ons-row>
       <% allP.forEach(function(allP){
         var item = allP.data();
         %>  
-        <ons-col width="33%">
-          <ons-card>
-            <img src="" alt="Onsen UI" style="width: 100%">
+        <ons-col width="50%" onclick="getDetail('<%=item.title%>');">
+          <ons-card >
+            <img src="<%=item.photo%>" alt="Onsen UI" style="width: 100%">
             <div class="title">
               <%=item.title%>
             </div>
@@ -211,13 +211,64 @@
     </script>
 
       
-      <ons-button onclick="addnewdata()">
+   <!--   <ons-button onclick="addnewdata()">
         ADD DATA
-      </ons-button>
+      </ons-button> -->
+
+    </ons-page>
+  </template>
+<!--detailP-->
+
+  <template id="detailP.html">
+    <ons-page>
+      <script>
+      var datadep = localStorage.getItem('getDep');
+      console.log(datadep)
+      </script>
+        <ons-toolbar>
+            <div class="left"><ons-back-button>Back</ons-back-button></div>
+            <div class="center">Detail</div>
+        </ons-toolbar>
+
+       <div id="showDep"></div>
+      
+       <script id="Detailproduct_template" type="text/template">
+          <ons-card>
+              <ons-carousel swipeable auto-scroll overscrollable id="carousel" style="height: 300px;">
+                
+                    <ons-carousel-item id="carousel1DeP" style="background: url('images/1.jpg') no-repeat center; background-size: contain;">
+                    </ons-carousel-item>
+                    <ons-carousel-item id="carousel2DeP" style="background: url('images/2.jpg') no-repeat center; background-size: contain;">
+                    </ons-carousel-item>
+                    <ons-carousel-item id="carousel3DeP" style="background: url('images/3.jpg') no-repeat center; background-size: contain;">
+                    </ons-carousel-item>
+      
+             </ons-carousel>
+                  <% dataDep.forEach(function(dataDep){   
+                    var data = dataDep.data(); %>
+              <div class="title">
+                <%= data.price%>
+              </div>
+              <div class="content">
+                <div>
+                  <%= data.title %>
+                </div>
+                <ons-list>
+                  <ons-list-header>Bindings</ons-list-header>
+                  <ons-list-item>Vue</ons-list-item>
+                  <ons-list-item>Angular</ons-list-item>
+                  <ons-list-item>React</ons-list-item>
+                </ons-list>
+              </div>
+              <%})%>
+            </ons-card>
+            
+       </script>
 
     </ons-page>
   </template>
 </body>
+
 <script>
   getHomeData();
   document.addEventListener('prechange', function (event) {
@@ -236,19 +287,22 @@
       getCartData();
     } else if (event.index == 1) {
       console.log("Shopping clicked");
-
       var cat = localStorage.getItem('cat');
       var proD = localStorage.getItem('proD');
-      console.log(cat);
       if(cat==undefined&&proD==undefined){
         getallProduct();
+       
       }else if(cat!=undefined||proD!=undefined){
         getallProduct(cat,proD);
-    }
-    
+      
+    } 
+
+
   }
 
   });
+  
+
 
   function getHomeData() {
     var docRef = db.collection("UI").doc("home");
@@ -296,16 +350,28 @@
     }else if(cat!=undefined&&proD==undefined){
     var apr = db.collection("Products").where("category", "==", cat); //เลือกเฉพาะ
   }else if(proD!=undefined){
-    var apr = db.collection("Products").where("category", "==", proD) //เหลือหา LIKE
+    var apr = db.collection("Products").where("category", "==", proD).where("category", "", proD)  //เหลือหา LIKE
   }
     apr.get().then(function (querySnapshot) {
       var allP_template = $('#allP_template').html();
-      console.log(querySnapshot);
+      console.log(querySnapshot.docs);
       var html = ejs.render(allP_template, { allP: querySnapshot.docs });
       $('#allP').html(html); 
+      
+    })
+  }
+
+  function showDetailP() {
+    var dataproduct = localStorage.getItem('getDep');
+    var apr = db.collection("Products").where("title", "==", dataproduct);
+    apr.get().then(function (querySnapshot) {
+      var Detailproduct_template = $('#Detailproduct_template').html();
+      var html = ejs.render(Detailproduct_template, { dataDep: querySnapshot.docs });
+      $('#showDep').html(html); 
     })
   
   }
+
   function addnewdata() {
     var data = {
       pid: 9,
@@ -331,6 +397,16 @@ function searchPro(proD){
 localStorage.setItem("proD",proD)
 document.getElementById('tabbar').setActiveTab(1);
 }
+
+function getDetail(getDep){
+localStorage.setItem("getDep",getDep)
+showDetailP();
+myNavigator.pushPage('detailP.html');
+
+}
+
+
+
 
 </script>
 
