@@ -35,13 +35,13 @@
   <script>
     // Initialize Firebase
     var config = {
-      apiKey: "AIzaSyC3ztwr4afyyOLIaRKau1LbHMRsddcME0k",
-      authDomain: "shopee-1bbd4.firebaseapp.com",
-      databaseURL: "https://shopee-1bbd4.firebaseio.com",
-      projectId: "shopee-1bbd4",
-      storageBucket: "shopee-1bbd4.appspot.com",
-      messagingSenderId: "285699665152"
-    };
+    apiKey: "AIzaSyCI_KM_2dcC7oyjGmsToRBTeVqjdhZC-Xo",
+    authDomain: "rif-shopee.firebaseapp.com",
+    databaseURL: "https://rif-shopee.firebaseio.com",
+    projectId: "rif-shopee",
+    storageBucket: "rif-shopee.appspot.com",
+    messagingSenderId: "770178372782"
+  };
     firebase.initializeApp(config);
     // Initialize Cloud Firestore through Firebase
     var db = firebase.firestore();
@@ -87,6 +87,7 @@
     </ons-tabbar>
   </ons-page>
 </ons-navigator>
+
 <!--HOME-->
   <template id="tab1.html">
     <ons-page id="Tab1">
@@ -109,6 +110,7 @@
       <script id="icon_template" type="text/template">
         <ons-row style="height:120px" vertical-align="center">  
         <% categories.forEach(function(category){%>  
+          console.log(category.data())
         <ons-col onclick="SelectCat('<%= category.name %>')" style="background:#66ff99; border:solid 1px white";   width="33%" >
           <p style="text-align: center; margin: 10px;">
             <ons-icon size="60px" icon="<%= category.icon %>"></ons-icon>          
@@ -262,9 +264,45 @@
               </div>
               <%})%>
             </ons-card>
-            
+            <!-- <ons-button onclick="addnewdata()">
+                ADD DATA
+              </ons-button> -->
        </script>
 
+    </ons-page>
+  </template>
+  <template id="tab2.html">
+    <ons-page id="Tab2">
+      <p><h5><b>Shopping Cart</b></h5></p>
+      
+<div id="showDataCart"></div>
+
+     <script id="cart_template" type="text/template">
+      <ons-list>
+        
+      <% cartData.forEach(function(cartData){
+          var cartData = cartData.data(); 
+        %>
+        <ons-list-item>
+          <div class="left">
+            <img class="list-item__thumbnail" src="<%=cartData.photo[0]%>">
+          </div>
+          <div class="center">
+            <span class="list-item__title"><%=cartData.title%></span>
+            <span class="list-item__subtitle" style="color: blue"><%=cartData.price%></span>
+          </div>
+          <div class="right">
+            <p style="text-align: center; margin: 10px;">
+              <ons-icon style="color: grey" size="30px" icon="md-delete"></ons-icon>
+            </p>
+          </div>
+        </ons-list-item>    
+      </ons-list>
+      <%})%>
+    </script>
+      <p style="text-align: center; margin: 10px;">
+        <ons-button modifier="large">PROCEED TO PAY</ons-button>
+      </p>
     </ons-page>
   </template>
 </body>
@@ -284,7 +322,7 @@
     } else if (event.index == 2) {
       console.log('Cart clicked');
       // get data for cart screen  
-      getCartData();
+      getData2cart()
     } else if (event.index == 1) {
       console.log("Shopping clicked");
       var cat = localStorage.getItem('cat');
@@ -405,7 +443,97 @@ myNavigator.pushPage('detailP.html');
 
 }
 
+var dataCart = [];
+function addtocart(add2cart){
+  localStorage.clear('quentinTarantino');
+localStorage.setItem('quentinTarantino',add2cart);
+var retrievedData = localStorage.getItem("quentinTarantino");
+console.log(retrievedData);
+dataCart.push(retrievedData);
+alert(dataCart);
+}
+function getData2cart(){
+  console.log('functioncart');
+  console.log(dataCart);
+  document.getElementById('showDataCart').innerHTML = '';
+  dataCart.forEach(function(dataCart){
+    var apr = db.collection("Products").where("title", "==",dataCart);
+    apr.get().then(function (querySnapshot) {
+      console.log(querySnapshot.docs)
+      var cart_template = $('#cart_template').html();
+      var html = ejs.render(cart_template, { cartData: querySnapshot.docs });
+      
+      $('#showDataCart').append(html); 
+    
+    })
+    
+  })
+}
+//ค้นหา
+function search(search) {
+   
+   const filterItems = (needle, heystack) => {
+    let query = needle.toLowerCase();
+    return heystack.filter(item => item.data().title.toLowerCase().indexOf(needle) >= 0);
+  }
+  console.log("55+", filterItems(search, data));
+  var item=filterItems(search, data);
+  console.log("xxx",item)
+  localStorage.setItem('items', item);
+  
 
+  console.log('tong',item);
+  
+test(item);
+
+document.getElementById('tabbar').setActiveTab(2);
+    // localStorage.setItem('title', item);
+  }
+  const data = []
+
+  function tatol() {
+    console.log(search);
+    db.collection("PRODUCTS").get()
+      .then(function (querySnapshot) {
+
+        querySnapshot.docs.forEach(function (item) {
+          data.push(item)
+          console.log(data)
+        });
+        
+      })
+    // const fruits = data[1];
+  }
+
+
+function test(title){
+console.log("888",title);
+// for(var i =0;i<tests.length;i++){
+    
+ 
+    console.log('tset',title);
+
+        // doc.data() is never undefined for query doc snapshots
+        
+        var product_template = $('#product_template').html();
+         var html = ejs.render(product_template, { product: title });
+        $('#product').html(html);
+  
+
+// console.log(tests)
+// db.collection("PRODUCTS").where("title", "==",tests).get()
+//       .then(function (querySnapshot) {
+//         // doc.data() is never undefined for query doc snapshots
+//         console.log(querySnapshot.docs);
+//         var test_template = $('#test_template').html();
+//         var html = ejs.render(test_template, { test: querySnapshot.docs });
+//         $('#test').html(html);
+//       })
+//       .catch(function (error) {
+//         console.log("Error getting documents: ", error);
+//       });
+// }}
+ }
 
 
 </script>
