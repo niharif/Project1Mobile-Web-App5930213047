@@ -111,9 +111,9 @@
         <ons-row style="height:120px" vertical-align="center">  
         <% categories.forEach(function(category){%>  
        
-        <ons-col onclick="SelectCat('<%= category.name %>')" style="background:#EECFA1; border:solid 1px white";   width="33%" >
+        <ons-col onclick="SelectCat('<%= category.name %>')" style="background:#63B8FF; border:solid 1px white";   width="33%" >
           <p style="text-align: center; margin: 10px;">
-            <ons-icon size="60px" icon="<%= category.icon %>"></ons-icon>          
+            <ons-icon style="color: #104E8B;" size="60px" icon="<%= category.icon %>"></ons-icon>          
           </p>
           <p style="text-align: center; margin: 10px;" id="icon1_text;">
             <%= category.name %>
@@ -295,7 +295,7 @@
           </div>
           <div class="center">
             <span class="list-item__title"><%=cartData.title%></span>
-            <span class="list-item__subtitle" style="color: blue"><%=cartData.price%> บาท</span>
+            <span class="list-item__subtitle" style="color: blue"><%=cartData.price%> </span>
           </div>
           <div class="right">
             <p style="text-align: center; margin: 10px;">
